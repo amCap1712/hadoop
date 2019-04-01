@@ -126,10 +126,12 @@ import org.apache.hadoop.util.StringUtils;
 
 import org.apache.hadoop.classification.VisibleForTesting;
 import com.sun.jersey.spi.container.ResourceFilters;
+import org.apache.hadoop.thirdparty.com.google.common.annotations.VisibleForTesting;
+import org.apache.hadoop.thirdparty.com.google.common.base.Charsets;
+import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
 
 /** Web-hdfs NameNode implementation. */
 @Path("")
-@ResourceFilters(ParamFilter.class)
 public class NamenodeWebHdfsMethods {
   public static final Logger LOG =
       LoggerFactory.getLogger(NamenodeWebHdfsMethods.class);

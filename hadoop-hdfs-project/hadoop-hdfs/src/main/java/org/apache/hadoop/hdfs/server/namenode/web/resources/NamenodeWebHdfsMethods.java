@@ -467,7 +467,6 @@ public class NamenodeWebHdfsMethods {
 
   /** Handle HTTP PUT request for the root. */
   @PUT
-  @Path("/")
   @Consumes({"*/*"})
   @Produces({MediaType.APPLICATION_OCTET_STREAM + "; " + JettyUtils.UTF_8,
       MediaType.APPLICATION_JSON + "; " + JettyUtils.UTF_8})
@@ -893,7 +892,6 @@ public class NamenodeWebHdfsMethods {
 
   /** Handle HTTP POST request for the root. */
   @POST
-  @Path("/")
   @Consumes({"*/*"})
   @Produces({MediaType.APPLICATION_OCTET_STREAM + "; " + JettyUtils.UTF_8,
       MediaType.APPLICATION_JSON + "; " + JettyUtils.UTF_8})
@@ -1023,7 +1021,6 @@ public class NamenodeWebHdfsMethods {
 
   /** Handle HTTP GET request for the root. */
   @GET
-  @Path("/")
   @Produces({MediaType.APPLICATION_OCTET_STREAM + "; " + JettyUtils.UTF_8,
       MediaType.APPLICATION_JSON + "; " + JettyUtils.UTF_8})
   public Response getRoot(
@@ -1578,7 +1575,6 @@ public class NamenodeWebHdfsMethods {
 
   /** Handle HTTP DELETE request for the root. */
   @DELETE
-  @Path("/")
   @Produces(MediaType.APPLICATION_JSON + "; " + JettyUtils.UTF_8)
   public Response deleteRoot(
       @Context final UserGroupInformation ugi,

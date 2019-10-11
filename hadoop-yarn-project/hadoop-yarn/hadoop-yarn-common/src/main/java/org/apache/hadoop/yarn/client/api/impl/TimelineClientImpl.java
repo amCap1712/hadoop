@@ -54,7 +54,7 @@ import org.apache.hadoop.yarn.webapp.YarnJacksonJaxbJsonProvider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hadoop.classification.VisibleForTesting;
-import com.sun.jersey.api.client.Client;
+import javax.ws.rs.client.Client;
 
 @Private
 @Evolving
@@ -156,7 +156,7 @@ public class TimelineClientImpl extends TimelineClient {
   }
 
   protected TimelineWriter createTimelineWriter(Configuration conf,
-      UserGroupInformation ugi, Client webClient, URI uri)
+                                                UserGroupInformation ugi, Client webClient, URI uri)
       throws IOException {
     if (timelineServiceV15Enabled) {
       return new FileSystemTimelineWriter(

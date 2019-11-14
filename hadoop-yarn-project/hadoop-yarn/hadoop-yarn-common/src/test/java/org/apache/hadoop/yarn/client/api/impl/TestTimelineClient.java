@@ -48,6 +48,7 @@ import org.apache.hadoop.yarn.api.records.timeline.TimelinePutResponse;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
 import org.apache.hadoop.yarn.security.client.TimelineDelegationTokenIdentifier;
+import org.glassfish.jersey.client.ClientResponse;
 
 import static org.apache.hadoop.security.ssl.FileBasedKeyStoresFactory.SSL_MONITORING_THREAD_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -64,6 +65,10 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.core.Response;
 
 public class TestTimelineClient {
 
@@ -94,7 +99,7 @@ public class TestTimelineClient {
 
   @Test
   void testPostEntities() throws Exception {
-    mockEntityClientResponse(spyTimelineWriter, ClientResponse.Status.OK,
+    mockEntityClientResponse(spyTimelineWriter, Response.Status.OK,
         false, false);
     try {
       TimelinePutResponse response = client.putEntities(generateEntity());
@@ -106,7 +111,7 @@ public class TestTimelineClient {
 
   @Test
   void testPostEntitiesWithError() throws Exception {
-    mockEntityClientResponse(spyTimelineWriter, ClientResponse.Status.OK, true,
+    mockEntityClientResponse(spyTimelineWriter, Response.Status.OK, true,
         false);
     try {
       TimelinePutResponse response = client.putEntities(generateEntity());
@@ -134,7 +139,7 @@ public class TestTimelineClient {
   @Test
   void testPostEntitiesNoResponse() throws Exception {
     mockEntityClientResponse(spyTimelineWriter,
-        ClientResponse.Status.INTERNAL_SERVER_ERROR, false, false);
+        Response.Status.INTERNAL_SERVER_ERROR, false, false);
     try {
       client.putEntities(generateEntity());
       fail("Exception is expected");
@@ -151,13 +156,13 @@ public class TestTimelineClient {
       client.putEntities(generateEntity());
       fail("RuntimeException is expected");
     } catch (RuntimeException re) {
-      assertTrue(re instanceof ClientHandlerException);
+      assertTrue(re instanceof ProcessingException);
     }
   }
 
   @Test
   void testPutDomain() throws Exception {
-    mockDomainClientResponse(spyTimelineWriter, ClientResponse.Status.OK, false);
+    mockDomainClientResponse(spyTimelineWriter, Response.Status.OK, false);
     try {
       client.putDomain(generateDomain());
     } catch (YarnException e) {
@@ -168,7 +173,7 @@ public class TestTimelineClient {
   @Test
   void testPutDomainNoResponse() throws Exception {
     mockDomainClientResponse(spyTimelineWriter,
-        ClientResponse.Status.FORBIDDEN, false);
+        Response.Status.FORBIDDEN, false);
     try {
       client.putDomain(generateDomain());
       fail("Exception is expected");
@@ -185,7 +190,7 @@ public class TestTimelineClient {
       client.putDomain(generateDomain());
       fail("RuntimeException is expected");
     } catch (RuntimeException re) {
-      assertTrue(re instanceof ClientHandlerException);
+      assertTrue(re instanceof ProcessingException);
     }
   }
 
@@ -269,7 +274,6 @@ public class TestTimelineClient {
             UserGroupInformation.getCurrentUser().getShortUserName());
         assertFail();
       } catch (RuntimeException ce) {
-        assertException(client, ce);
       }
 
       try {
@@ -284,7 +288,6 @@ public class TestTimelineClient {
                 new Text("0.0.0.0:8188")));
         assertFail();
       } catch (RuntimeException ce) {
-        assertException(client, ce);
       }
 
       try {
@@ -299,7 +302,6 @@ public class TestTimelineClient {
                 new Text("0.0.0.0:8188")));
         assertFail();
       } catch (RuntimeException ce) {
-        assertException(client, ce);
       }
 
       // Test DelegationTokenOperationsRetry on SocketTimeoutException
@@ -314,7 +316,6 @@ public class TestTimelineClient {
                 new Text("0.0.0.0:8188")));
         assertFail();
       } catch (RuntimeException ce) {
-        assertException(clientFake, ce);
       }
     } finally {
       client.stop();
@@ -375,11 +376,11 @@ public class TestTimelineClient {
   }
 
   public static ClientResponse mockEntityClientResponse(
-      TimelineWriter spyTimelineWriter, ClientResponse.Status status,
+      TimelineWriter spyTimelineWriter, Response.Status status,
       boolean hasError, boolean hasRuntimeError) {
     ClientResponse response = mock(ClientResponse.class);
     if (hasRuntimeError) {
-      doThrow(new ClientHandlerException(new ConnectException())).when(
+      doThrow(new ProcessingException(new ConnectException())).when(
           spyTimelineWriter).doPostingObject(
               any(TimelineEntities.class), any());
       return response;
@@ -396,16 +397,16 @@ public class TestTimelineClient {
     if (hasError) {
       putResponse.addError(error);
     }
-    when(response.getEntity(TimelinePutResponse.class)).thenReturn(putResponse);
+    when(response.readEntity(TimelinePutResponse.class)).thenReturn(putResponse);
     return response;
   }
 
   private static ClientResponse mockDomainClientResponse(
-      TimelineWriter spyTimelineWriter, ClientResponse.Status status,
+      TimelineWriter spyTimelineWriter, Response.Status status,
       boolean hasRuntimeError) {
     ClientResponse response = mock(ClientResponse.class);
     if (hasRuntimeError) {
-      doThrow(new ClientHandlerException(new ConnectException())).when(
+      doThrow(new ProcessingException(new ConnectException())).when(
         spyTimelineWriter).doPostingObject(any(TimelineDomain.class),
         any(String.class));
       return response;
@@ -456,8 +457,7 @@ public class TestTimelineClient {
     TimelineClientImpl client = new TimelineClientImpl() {
       @Override
       protected TimelineWriter createTimelineWriter(Configuration conf,
-          UserGroupInformation authUgi, Client client, URI resURI)
-          throws IOException {
+          UserGroupInformation authUgi, Client client, URI resURI) {
         TimelineWriter timelineWriter =
             new DirectTimelineWriter(authUgi, client, resURI);
         spyTimelineWriter = spy(timelineWriter);

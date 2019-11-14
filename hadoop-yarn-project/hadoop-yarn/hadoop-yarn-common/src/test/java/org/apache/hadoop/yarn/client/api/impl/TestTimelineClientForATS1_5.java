@@ -22,11 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.glassfish.jersey.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +46,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.core.Response;
 
 public class TestTimelineClientForATS1_5 {
 
@@ -259,7 +257,7 @@ public class TestTimelineClientForATS1_5 {
               public ClientResponse doPostingObject(Object object, String path) {
                 ClientResponse response = mock(ClientResponse.class);
                 when(response.getStatusInfo()).thenReturn(
-                    ClientResponse.Status.OK);
+                    Response.Status.OK);
                 return response;
               }
             };

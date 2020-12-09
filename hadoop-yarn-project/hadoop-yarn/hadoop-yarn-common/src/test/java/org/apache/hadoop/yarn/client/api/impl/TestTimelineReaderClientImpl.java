@@ -146,9 +146,9 @@ public class TestTimelineReaderClientImpl {
 
   private class MockTimelineReaderClient extends TimelineReaderClientImpl {
     @Override
-    protected ClientResponse doGetUri(URI base, String path,
-                                MultivaluedMap<String, String> params) throws IOException {
-      ClientResponse mockClientResponse = mock(ClientResponse.class);
+    protected Response doGetUri(URI base, String path,
+        MultivaluedMap<String, String> params) {
+      Response mockClientResponse = mock(Response.class);
       if (path.contains(YARN_CONTAINER.toString()) && !params.containsKey("infofilters")) {
         when(mockClientResponse.readEntity(TimelineEntity.class)).thenReturn(
             createTimelineEntity("mockContainer1"));

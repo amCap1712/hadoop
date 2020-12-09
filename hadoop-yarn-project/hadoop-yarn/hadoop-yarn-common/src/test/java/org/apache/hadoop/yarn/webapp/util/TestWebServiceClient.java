@@ -35,6 +35,8 @@ import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import javax.ws.rs.core.Response;
+
 public class TestWebServiceClient {
 
   private static final String BASEDIR = System.getProperty("test.build.dir",
@@ -92,9 +94,8 @@ public class TestWebServiceClient {
     URL u = new URL(baseUrl, SERVLET_PATH_ECHO + "?a=b&c=d");
     WebServiceClient.initialize(sslConf);
     WebServiceClient client = WebServiceClient.getWebServiceClient();
-    HttpURLConnection conn = client.getHttpURLConnectionFactory()
-        .getHttpURLConnection(u);
-    assertEquals(HttpURLConnection.HTTP_OK, conn.getResponseCode());
+    Response resp = client.createClient().target(u.toURI()).request().get();
+    assertEquals(HttpURLConnection.HTTP_OK, resp.getStatus());
     WebServiceClient.destroy();
     server.stop();
     FileUtil.fullyDelete(new File(BASEDIR));

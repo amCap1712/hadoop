@@ -300,7 +300,11 @@ public class TimelineConnector extends AbstractService {
           || e.getCause() instanceof SocketException))
         .withDelay(Duration.ofMillis(retryInterval))
         .withMaxRetries(maxRetries);
-    }
+  }
+
+  RetryPolicy<Object> getRetryPolicy() {
+    return retryPolicy;
+  }
 
   @Private
   @VisibleForTesting

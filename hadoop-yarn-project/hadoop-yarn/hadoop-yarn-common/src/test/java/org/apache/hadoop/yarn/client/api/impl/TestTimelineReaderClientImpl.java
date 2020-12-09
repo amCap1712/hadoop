@@ -37,7 +37,6 @@ import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.api.records.timelineservice.TimelineEntity;
 import org.apache.hadoop.yarn.client.api.TimelineReaderClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
-import org.glassfish.jersey.client.ClientResponse;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -48,6 +47,11 @@ import static org.apache.hadoop.yarn.api.records.timelineservice.TimelineEntityT
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Test class for Timeline Reader Client.
@@ -151,9 +155,9 @@ public class TestTimelineReaderClientImpl {
 
   private class MockTimelineReaderClient extends TimelineReaderClientImpl {
     @Override
-    protected ClientResponse doGetUri(URI base, String path,
-                                MultivaluedMap<String, String> params) throws IOException {
-      ClientResponse mockClientResponse = mock(ClientResponse.class);
+    protected Response doGetUri(URI base, String path,
+        MultivaluedMap<String, String> params) {
+      Response mockClientResponse = mock(Response.class);
       if (path.contains(YARN_CONTAINER.toString()) && !params.containsKey("infofilters")) {
         when(mockClientResponse.readEntity(TimelineEntity.class)).thenReturn(
             createTimelineEntity("mockContainer1"));

@@ -22,9 +22,7 @@ import static org.apache.hadoop.util.Preconditions.checkNotNull;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.classification.InterfaceAudience;
@@ -33,13 +31,13 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.http.HttpServer2;
 import org.apache.hadoop.util.Lists;
 import org.apache.hadoop.yarn.webapp.view.RobotsTextPage;
-import org.glassfish.jersey.servlet.ServletProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.hadoop.thirdparty.com.google.common.base.Splitter;
 
 import com.google.inject.Provides;
+import com.google.inject.Scopes;
 import com.google.inject.servlet.GuiceFilter;
 import com.google.inject.servlet.ServletModule;
 
@@ -181,10 +179,7 @@ public abstract class WebApp extends ServletModule {
       // from /* below - that doesn't work.
       String regex = "(?!/" + this.wsName + ")";
       serveRegex(regex).with(DefaultWrapperServlet.class);
-
-      Map<String, String> params = new HashMap<String, String>();
-      params.put(ServletProperties.FILTER_FORWARD_ON_404, "true");
-      filter("/*").through(getWebAppFilterClass(), params);
+      bind(getWebAppFilterClass()).in(Scopes.SINGLETON);
     }
   }
 

@@ -24,13 +24,7 @@ import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.security.PrivilegedExceptionAction;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientResponse;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
+import net.jodah.failsafe.RetryPolicy;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.http.HttpConfig.Policy;
@@ -51,6 +45,9 @@ import org.apache.hadoop.yarn.security.client.TimelineDelegationTokenIdentifier;
 import org.glassfish.jersey.client.ClientResponse;
 
 import static org.apache.hadoop.security.ssl.FileBasedKeyStoresFactory.SSL_MONITORING_THREAD_NAME;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -457,9 +454,10 @@ public class TestTimelineClient {
     TimelineClientImpl client = new TimelineClientImpl() {
       @Override
       protected TimelineWriter createTimelineWriter(Configuration conf,
-          UserGroupInformation authUgi, Client client, URI resURI) {
+          UserGroupInformation authUgi, Client client, URI resURI,
+          RetryPolicy<Object> retryPolicy) {
         TimelineWriter timelineWriter =
-            new DirectTimelineWriter(authUgi, client, resURI);
+            new DirectTimelineWriter(authUgi, client, resURI, retryPolicy);
         spyTimelineWriter = spy(timelineWriter);
         return spyTimelineWriter;
       }

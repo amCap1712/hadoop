@@ -34,6 +34,7 @@ import org.apache.hadoop.security.ssl.KeyStoreTestUtil;
 import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.security.token.delegation.AbstractDelegationTokenSecretManager;
 import org.apache.hadoop.test.TestGenericTestUtils;
+import org.apache.hadoop.util.Time;
 import org.apache.hadoop.yarn.api.records.timeline.TimelineDomain;
 import org.apache.hadoop.yarn.api.records.timeline.TimelineEntities;
 import org.apache.hadoop.yarn.api.records.timeline.TimelineEntity;
@@ -225,6 +226,7 @@ public class TestTimelineClient {
         newIntervalMs);
     conf.setBoolean(YarnConfiguration.TIMELINE_SERVICE_ENABLED, true);
     TimelineClientImpl client = createTimelineClient(conf);
+    long start = Time.monotonicNow();
     try {
       // This call should fail because there is no timeline server
       client.putEntities(generateEntity());
